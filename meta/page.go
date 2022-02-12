@@ -1,16 +1,16 @@
 package meta
 
 import (
-	"image"
 	"image/color"
 
+	"gioui.org/f32"
 	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 )
 
 type page struct {
-	W, H int
+	W, H float32
 }
 
 func NewA4() *page {
@@ -20,10 +20,13 @@ func NewA4() *page {
 }
 
 func (p *page) Render(ops *op.Ops) {
-	clip.Rect{
-		Min: image.Pt(0, 0),
-		Max: image.Point{p.W, p.H},
-	}.Push(ops)
+	r := clip.RRect{
+		Rect: f32.Rectangle{
+			Min: f32.Pt(0, 0),
+			Max: f32.Pt(p.W, p.H),
+		},
+	}
+	clip.Stroke{Path: r.Path(ops), Width: 1.25}.Op().Push(ops)
 	paint.ColorOp{Color: color.NRGBA{R: 0x80, A: 0xFF}}.Add(ops)
 	paint.PaintOp{}.Add(ops)
 }

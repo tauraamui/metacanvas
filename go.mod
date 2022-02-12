@@ -3,7 +3,7 @@ module github.com/tauraamui/metacanvas
 go 1.17
 
 require (
-	gioui.org v0.0.0-20220204144006-77557edd3360
+	gioui.org v0.0.0-20220212110110-216f2c329556
 	github.com/tacusci/logging/v2 v2.1.1
 )
 
