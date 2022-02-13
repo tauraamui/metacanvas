@@ -1,4 +1,4 @@
-package meta
+package entity
 
 import (
 	"gioui.org/op"

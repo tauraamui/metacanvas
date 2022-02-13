@@ -9,6 +9,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/widget/material"
+	"github.com/tauraamui/metacanvas/entity"
 )
 
 type Canvas struct {
@@ -18,6 +19,7 @@ type Canvas struct {
 	scale   float32
 	offsetX float32
 	offsetY float32
+	ee      entity.Stack
 }
 
 func NewCanvas() *Canvas {
@@ -29,13 +31,17 @@ func NewCanvas() *Canvas {
 	}
 }
 
+func (c *Canvas) Update(gtx layout.Context) {
+	pointer.CursorNameOp{Name: c.updateInput(gtx)}.Add(gtx.Ops)
+}
+
 func (c *Canvas) Render(gtx layout.Context) {
-	pointer.CursorNameOp{Name: c.updateTransforms(gtx)}.Add(gtx.Ops)
 	c.applyTransforms(gtx)
+	c.ee.Render(gtx.Ops)
 	c.page.Render(gtx.Ops)
 }
 
-func (c *Canvas) updateTransforms(gtx layout.Context) pointer.CursorName {
+func (c *Canvas) updateInput(gtx layout.Context) pointer.CursorName {
 	c.input.update(gtx)
 
 	if c.input.drag {

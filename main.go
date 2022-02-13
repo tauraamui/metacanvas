@@ -33,6 +33,7 @@ func run(w *app.Window) error {
 			return e.Err
 		case system.FrameEvent:
 			gtx := layout.NewContext(&ops, e)
+			canvas.Update(gtx)
 			canvas.Render(gtx)
 			e.Frame(gtx.Ops)
 		}
