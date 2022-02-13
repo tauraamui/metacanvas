@@ -30,18 +30,18 @@ func NewCanvas() *Canvas {
 }
 
 func (c *Canvas) Render(gtx layout.Context) {
-	c.updateTransforms(gtx)
+	pointer.CursorNameOp{Name: c.updateTransforms(gtx)}.Add(gtx.Ops)
 	c.applyTransforms(gtx)
 	c.page.Render(gtx.Ops)
 }
 
-func (c *Canvas) updateTransforms(gtx layout.Context) {
+func (c *Canvas) updateTransforms(gtx layout.Context) pointer.CursorName {
 	c.input.update(gtx)
 
 	if c.input.drag {
 		c.offsetX -= c.input.dragDeltaX
 		c.offsetY -= c.input.dragDeltaY
-		return
+		return pointer.CursorGrab
 	}
 
 	if c.input.scroll {
@@ -52,6 +52,8 @@ func (c *Canvas) updateTransforms(gtx layout.Context) {
 			c.scale = 0.01
 		}
 	}
+
+	return pointer.CursorDefault
 }
 
 func (c *Canvas) applyTransforms(gtx layout.Context) {
