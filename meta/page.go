@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"gioui.org/f32"
+	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
@@ -19,7 +20,14 @@ type page struct {
 func NewA4() *page {
 	return &page{
 		W: 800, H: 1000,
+		ee: entity.Stack{
+			&entity.TextBox{X: 10, Y: 10, W: 250, H: 20},
+		},
 	}
+}
+
+func (p *page) Update(gtx layout.Context) {
+	p.ee.Update(gtx)
 }
 
 func (p *page) Render(ops *op.Ops) {
