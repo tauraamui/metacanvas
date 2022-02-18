@@ -5,7 +5,6 @@ import (
 
 	"gioui.org/f32"
 	"gioui.org/layout"
-	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"github.com/tauraamui/metacanvas/entity"
@@ -30,7 +29,7 @@ func (p *page) Update(gtx layout.Context) {
 	p.ee.Update(gtx)
 }
 
-func (p *page) Render(ops *op.Ops) {
+func (p *page) Render(ctx Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
 			Min: f32.Pt(0, 0),
@@ -39,16 +38,16 @@ func (p *page) Render(ops *op.Ops) {
 	}
 
 	if p.clipToPage {
-		bc := bounds.Push(ops)
+		bc := bounds.Push(ctx.ops)
 		defer bc.Pop()
 	}
 
 	// entities stack
-	p.ee.Render(ops)
+	p.ee.Render(ctx.ops)
 
 	// page outline
-	cl := clip.Stroke{Path: bounds.Path(ops), Width: 1.2}.Op().Push(ops)
-	paint.ColorOp{Color: color.NRGBA{R: 0xFF, A: 0xFF}}.Add(ops)
-	paint.PaintOp{}.Add(ops)
+	cl := clip.Stroke{Path: bounds.Path(ctx.ops), Width: 1.2}.Op().Push(ctx.ops)
+	paint.ColorOp{Color: color.NRGBA{R: 0xFF, A: 0xFF}}.Add(ctx.ops)
+	paint.PaintOp{}.Add(ctx.ops)
 	cl.Pop()
 }

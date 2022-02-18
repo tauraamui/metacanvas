@@ -8,18 +8,32 @@ import (
 	"github.com/tauraamui/metacanvas/input"
 )
 
-type Canvas struct {
-	page    *page
-	input   *input.Pointer
+type Context struct {
+	ops     *op.Ops
 	scale   float32
 	offsetX float32
 	offsetY float32
 }
 
+func (c *Context) ApplyTransformsToOps() {
+	op.Offset(f32.Pt(c.offsetX, c.offsetY)).Add(c.ops)
+	aff := f32.Affine2D{}.Scale(
+		f32.Pt(0, 0),
+		f32.Pt(c.scale, c.scale),
+	)
+	op.Affine(aff).Add(c.ops)
+}
+
+type Canvas struct {
+	ctx   Context
+	page  *page
+	input *input.Pointer
+}
+
 func NewCanvas() *Canvas {
 	c := &Canvas{
-		scale: 1,
-		page:  NewA4(),
+		ctx:  Context{scale: 1},
+		page: NewA4(),
 	}
 	c.input = &input.Pointer{}
 	c.input.PointerEventTag = c.input
@@ -32,36 +46,28 @@ func (c *Canvas) Update(gtx layout.Context) {
 }
 
 func (c *Canvas) Render(gtx layout.Context) {
-	c.applyTransforms(gtx)
-	c.page.Render(gtx.Ops)
+	c.ctx.ops = gtx.Ops
+	c.ctx.ApplyTransformsToOps()
+	c.page.Render(c.ctx)
 }
 
 func (c *Canvas) updateInput(gtx layout.Context) pointer.CursorName {
 	c.input.Update(gtx)
 
 	if c.input.Drag {
-		c.offsetX -= c.input.DragDeltaX
-		c.offsetY -= c.input.DragDeltaY
+		c.ctx.offsetX -= c.input.DragDeltaX
+		c.ctx.offsetY -= c.input.DragDeltaY
 		return pointer.CursorGrab
 	}
 
 	if c.input.Scroll {
-		c.scale -= c.input.ScrollY
-		if c.scale > 1 {
-			c.scale = 1
-		} else if c.scale < 0.01 {
-			c.scale = 0.01
+		c.ctx.scale -= c.input.ScrollY
+		if c.ctx.scale > 1 {
+			c.ctx.scale = 1
+		} else if c.ctx.scale < 0.01 {
+			c.ctx.scale = 0.01
 		}
 	}
 
 	return pointer.CursorDefault
-}
-
-func (c *Canvas) applyTransforms(gtx layout.Context) {
-	op.Offset(f32.Pt(c.offsetX, c.offsetY)).Add(gtx.Ops)
-	aff := f32.Affine2D{}.Scale(
-		f32.Pt(0, 0),
-		f32.Pt(c.scale, c.scale),
-	)
-	op.Affine(aff).Add(gtx.Ops)
 }
