@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"gioui.org/f32"
-	"gioui.org/layout"
+	"gioui.org/io/event"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	context "github.com/tauraamui/metacanvas/ctx"
@@ -26,8 +26,8 @@ func NewA4() *page {
 	}
 }
 
-func (p *page) Update(gtx layout.Context) {
-	p.ee.Update(gtx)
+func (p *page) Update(ctx *context.Context, eq event.Queue) {
+	p.ee.Update(ctx, eq)
 }
 
 func (p *page) Render(ctx *context.Context) {

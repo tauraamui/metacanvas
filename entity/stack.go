@@ -1,15 +1,15 @@
 package entity
 
 import (
-	"gioui.org/layout"
+	"gioui.org/io/event"
 	context "github.com/tauraamui/metacanvas/ctx"
 )
 
 type Stack []Entity
 
-func (s Stack) Update(gtx layout.Context) {
+func (s Stack) Update(ctx *context.Context, eq event.Queue) {
 	for _, e := range s {
-		e.Update(gtx)
+		e.Update(ctx, eq)
 	}
 }
 

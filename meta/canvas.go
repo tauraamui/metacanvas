@@ -2,6 +2,7 @@ package meta
 
 import (
 	"gioui.org/f32"
+	"gioui.org/io/event"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
 	context "github.com/tauraamui/metacanvas/ctx"
@@ -25,8 +26,9 @@ func NewCanvas() *Canvas {
 }
 
 func (c *Canvas) Update(gtx layout.Context) {
-	pointer.CursorNameOp{Name: c.updateInput(gtx)}.Add(gtx.Ops)
-	c.page.Update(gtx)
+	c.ctx.Ops = gtx.Ops
+	pointer.CursorNameOp{Name: c.updateInput(c.ctx, gtx.Queue)}.Add(gtx.Ops)
+	c.page.Update(c.ctx, gtx.Queue)
 }
 
 func (c *Canvas) Render(gtx layout.Context) {
@@ -35,8 +37,8 @@ func (c *Canvas) Render(gtx layout.Context) {
 	c.page.Render(c.ctx)
 }
 
-func (c *Canvas) updateInput(gtx layout.Context) pointer.CursorName {
-	c.input.Update(gtx)
+func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
+	c.input.Update(ctx, eq)
 
 	if c.input.Drag {
 		c.ctx.SubOffset(f32.Pt(c.input.DragDeltaX, c.input.DragDeltaY))

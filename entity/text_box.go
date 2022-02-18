@@ -5,8 +5,8 @@ import (
 	"image/color"
 
 	"gioui.org/f32"
+	"gioui.org/io/event"
 	"gioui.org/io/pointer"
-	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	context "github.com/tauraamui/metacanvas/ctx"
@@ -22,8 +22,8 @@ func (t *TextBox) id() uint {
 	return 0
 }
 
-func (t *TextBox) Update(gtx layout.Context) {
-	t.updateInput(gtx)
+func (t *TextBox) Update(ctx *context.Context, eq event.Queue) {
+	t.updateInput(ctx, eq)
 }
 
 func (t *TextBox) Render(ctx *context.Context) {
@@ -41,14 +41,14 @@ func (t *TextBox) Render(ctx *context.Context) {
 	cs.Pop()
 }
 
-func (t *TextBox) updateInput(gtx layout.Context) pointer.CursorName {
+func (t *TextBox) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
 	if t.input == nil {
 		t.input = &input.Pointer{
 			AOE: f32.Rect(t.X, t.Y, t.X+t.W, t.Y+t.H),
 		}
 		t.input.PointerEventTag = t.input
 	}
-	t.input.Update(gtx)
+	t.input.Update(ctx, eq)
 
 	fmt.Printf("PRESSED: %f, %f\n", t.input.LastPosX, t.input.LastPosY)
 

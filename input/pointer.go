@@ -4,9 +4,10 @@ import (
 	"image"
 
 	"gioui.org/f32"
+	"gioui.org/io/event"
 	"gioui.org/io/pointer"
-	"gioui.org/layout"
 	"gioui.org/op/clip"
+	context "github.com/tauraamui/metacanvas/ctx"
 )
 
 type Pointer struct {
@@ -22,9 +23,9 @@ type Pointer struct {
 	LastPosY        float32
 }
 
-func (i *Pointer) Update(gtx layout.Context) {
+func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 	i.Scroll = false
-	for _, evt := range gtx.Events(&i.PointerEventTag) {
+	for _, evt := range eq.Events(&i.PointerEventTag) {
 		x, ok := evt.(pointer.Event)
 		if !ok {
 			continue
@@ -64,7 +65,7 @@ func (i *Pointer) Update(gtx layout.Context) {
 	}
 
 	if !i.AOE.Empty() {
-		area := clip.RRect{Rect: i.AOE}.Push(gtx.Ops)
+		area := clip.RRect{Rect: i.AOE}.Push(ctx.Ops)
 		defer area.Pop()
 	}
 
@@ -72,5 +73,5 @@ func (i *Pointer) Update(gtx layout.Context) {
 		Tag:          &i.PointerEventTag,
 		ScrollBounds: image.Rect(-1, -1, 1, 1),
 		Types:        pointer.Press | pointer.Drag | pointer.Release | pointer.Scroll,
-	}.Add(gtx.Ops)
+	}.Add(ctx.Ops)
 }
