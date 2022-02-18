@@ -30,7 +30,7 @@ func (p *page) Update(gtx layout.Context) {
 	p.ee.Update(gtx)
 }
 
-func (p *page) Render(ctx context.Context) {
+func (p *page) Render(ctx *context.Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
 			Min: f32.Pt(p.X, p.Y),

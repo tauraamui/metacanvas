@@ -5,5 +5,5 @@ import (
 )
 
 type Renderable interface {
-	Render(context.Context)
+	Render(*context.Context)
 }

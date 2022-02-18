@@ -26,7 +26,7 @@ func (t *TextBox) Update(gtx layout.Context) {
 	t.updateInput(gtx)
 }
 
-func (t *TextBox) Render(ctx context.Context) {
+func (t *TextBox) Render(ctx *context.Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
 			Min: f32.Pt(t.X, t.Y),

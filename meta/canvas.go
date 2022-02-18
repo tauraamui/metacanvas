@@ -1,6 +1,7 @@
 package meta
 
 import (
+	"gioui.org/f32"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
 	context "github.com/tauraamui/metacanvas/ctx"
@@ -8,14 +9,14 @@ import (
 )
 
 type Canvas struct {
-	ctx   context.Context
+	ctx   *context.Context
 	page  *page
 	input *input.Pointer
 }
 
 func NewCanvas() *Canvas {
 	c := &Canvas{
-		ctx:  context.Context{Scale: 1},
+		ctx:  context.New(1),
 		page: NewA4(),
 	}
 	c.input = &input.Pointer{}
@@ -38,18 +39,12 @@ func (c *Canvas) updateInput(gtx layout.Context) pointer.CursorName {
 	c.input.Update(gtx)
 
 	if c.input.Drag {
-		c.ctx.OffsetX -= c.input.DragDeltaX
-		c.ctx.OffsetY -= c.input.DragDeltaY
+		c.ctx.SubOffset(f32.Pt(c.input.DragDeltaX, c.input.DragDeltaY))
 		return pointer.CursorGrab
 	}
 
 	if c.input.Scroll {
-		c.ctx.Scale -= c.input.ScrollY
-		if c.ctx.Scale > 1 {
-			c.ctx.Scale = 1
-		} else if c.ctx.Scale < 0.01 {
-			c.ctx.Scale = 0.01
-		}
+		c.ctx.SubScale(c.input.ScrollY)
 	}
 
 	return pointer.CursorDefault

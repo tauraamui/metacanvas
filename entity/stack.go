@@ -13,7 +13,7 @@ func (s Stack) Update(gtx layout.Context) {
 	}
 }
 
-func (s Stack) Render(ctx context.Context) {
+func (s Stack) Render(ctx *context.Context) {
 	for _, e := range s {
 		e.Render(ctx)
 	}
