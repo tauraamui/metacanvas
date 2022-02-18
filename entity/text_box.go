@@ -7,9 +7,9 @@ import (
 	"gioui.org/f32"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
-	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
+	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/input"
 )
 
@@ -26,7 +26,7 @@ func (t *TextBox) Update(gtx layout.Context) {
 	t.updateInput(gtx)
 }
 
-func (t *TextBox) Render(ops *op.Ops) {
+func (t *TextBox) Render(ctx context.Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
 			Min: f32.Pt(t.X, t.Y),
@@ -35,9 +35,9 @@ func (t *TextBox) Render(ops *op.Ops) {
 	}
 
 	// outline
-	cs := clip.Outline{Path: bounds.Path(ops)}.Op().Push(ops)
-	paint.ColorOp{Color: color.NRGBA{R: 0x80, B: 0x80, A: 0xFF}}.Add(ops)
-	paint.PaintOp{}.Add(ops)
+	cs := clip.Outline{Path: bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
+	paint.ColorOp{Color: color.NRGBA{R: 0x80, B: 0x80, A: 0xFF}}.Add(ctx.Ops)
+	paint.PaintOp{}.Add(ctx.Ops)
 	cs.Pop()
 }
 

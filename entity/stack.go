@@ -2,7 +2,7 @@ package entity
 
 import (
 	"gioui.org/layout"
-	"gioui.org/op"
+	context "github.com/tauraamui/metacanvas/ctx"
 )
 
 type Stack []Entity
@@ -13,8 +13,8 @@ func (s Stack) Update(gtx layout.Context) {
 	}
 }
 
-func (s Stack) Render(ops *op.Ops) {
+func (s Stack) Render(ctx context.Context) {
 	for _, e := range s {
-		e.Render(ops)
+		e.Render(ctx)
 	}
 }

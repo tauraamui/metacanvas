@@ -1,38 +1,21 @@
 package meta
 
 import (
-	"gioui.org/f32"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
-	"gioui.org/op"
+	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/input"
 )
 
-type Context struct {
-	ops     *op.Ops
-	scale   float32
-	offsetX float32
-	offsetY float32
-}
-
-func (c *Context) ApplyTransformsToOps() {
-	op.Offset(f32.Pt(c.offsetX, c.offsetY)).Add(c.ops)
-	aff := f32.Affine2D{}.Scale(
-		f32.Pt(0, 0),
-		f32.Pt(c.scale, c.scale),
-	)
-	op.Affine(aff).Add(c.ops)
-}
-
 type Canvas struct {
-	ctx   Context
+	ctx   context.Context
 	page  *page
 	input *input.Pointer
 }
 
 func NewCanvas() *Canvas {
 	c := &Canvas{
-		ctx:  Context{scale: 1},
+		ctx:  context.Context{Scale: 1},
 		page: NewA4(),
 	}
 	c.input = &input.Pointer{}
@@ -46,7 +29,7 @@ func (c *Canvas) Update(gtx layout.Context) {
 }
 
 func (c *Canvas) Render(gtx layout.Context) {
-	c.ctx.ops = gtx.Ops
+	c.ctx.Ops = gtx.Ops
 	c.ctx.ApplyTransformsToOps()
 	c.page.Render(c.ctx)
 }
@@ -55,17 +38,17 @@ func (c *Canvas) updateInput(gtx layout.Context) pointer.CursorName {
 	c.input.Update(gtx)
 
 	if c.input.Drag {
-		c.ctx.offsetX -= c.input.DragDeltaX
-		c.ctx.offsetY -= c.input.DragDeltaY
+		c.ctx.OffsetX -= c.input.DragDeltaX
+		c.ctx.OffsetY -= c.input.DragDeltaY
 		return pointer.CursorGrab
 	}
 
 	if c.input.Scroll {
-		c.ctx.scale -= c.input.ScrollY
-		if c.ctx.scale > 1 {
-			c.ctx.scale = 1
-		} else if c.ctx.scale < 0.01 {
-			c.ctx.scale = 0.01
+		c.ctx.Scale -= c.input.ScrollY
+		if c.ctx.Scale > 1 {
+			c.ctx.Scale = 1
+		} else if c.ctx.Scale < 0.01 {
+			c.ctx.Scale = 0.01
 		}
 	}
 

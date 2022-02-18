@@ -1,9 +1,9 @@
 package entity
 
 import (
-	"gioui.org/op"
+	context "github.com/tauraamui/metacanvas/ctx"
 )
 
 type Renderable interface {
-	Render(*op.Ops)
+	Render(context.Context)
 }

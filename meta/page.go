@@ -7,6 +7,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
+	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/entity"
 )
 
@@ -29,25 +30,25 @@ func (p *page) Update(gtx layout.Context) {
 	p.ee.Update(gtx)
 }
 
-func (p *page) Render(ctx Context) {
+func (p *page) Render(ctx context.Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
-			Min: f32.Pt(0, 0),
-			Max: f32.Pt(p.W, p.H),
+			Min: f32.Pt(p.X, p.Y),
+			Max: f32.Pt(p.X+p.W, p.Y+p.H),
 		},
 	}
 
 	if p.clipToPage {
-		bc := bounds.Push(ctx.ops)
+		bc := bounds.Push(ctx.Ops)
 		defer bc.Pop()
 	}
 
 	// entities stack
-	p.ee.Render(ctx.ops)
+	p.ee.Render(ctx)
 
 	// page outline
-	cl := clip.Stroke{Path: bounds.Path(ctx.ops), Width: 1.2}.Op().Push(ctx.ops)
-	paint.ColorOp{Color: color.NRGBA{R: 0xFF, A: 0xFF}}.Add(ctx.ops)
-	paint.PaintOp{}.Add(ctx.ops)
+	cl := clip.Stroke{Path: bounds.Path(ctx.Ops), Width: 1.2}.Op().Push(ctx.Ops)
+	paint.ColorOp{Color: color.NRGBA{R: 0xFF, A: 0xFF}}.Add(ctx.Ops)
+	paint.PaintOp{}.Add(ctx.Ops)
 	cl.Pop()
 }
