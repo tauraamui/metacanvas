@@ -42,22 +42,17 @@ func (t *TextBox) Render(ctx *context.Context) {
 }
 
 func (t *TextBox) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
-	if t.input == nil {
+	if t.input == nil || ctx.IsDirty() {
+		screenXY := ctx.Screen2Pt(f32.Pt(t.X, t.Y))
+		screenWH := ctx.Screen2Pt(f32.Pt(t.X+t.W, t.Y+t.H))
 		t.input = &input.Pointer{
-			AOE: f32.Rect(t.X, t.Y, t.X+t.W, t.Y+t.H),
+			AOE: f32.Rect(screenXY.X, screenXY.Y, screenWH.X, screenWH.Y),
 		}
 		t.input.PointerEventTag = t.input
 	}
 	t.input.Update(ctx, eq)
 
 	fmt.Printf("PRESSED: %f, %f\n", t.input.LastPosX, t.input.LastPosY)
-
-	if t.input.Drag {
-		t.X -= t.input.DragDeltaX
-		t.Y -= t.input.DragDeltaY
-		t.input.AOE = f32.Rect(t.X, t.Y, t.X+t.W, t.Y+t.H)
-		return pointer.CursorGrab
-	}
 
 	return pointer.CursorDefault
 }

@@ -18,6 +18,12 @@ func New(scale float32) *Context {
 	return &Context{scale: scale}
 }
 
+func (c *Context) IsDirty() bool {
+	y := c.dirty
+	c.dirty = false
+	return y
+}
+
 func (c *Context) Pt2Screen(pt f32.Point) f32.Point {
 	return pt.Sub(c.offset)
 }
