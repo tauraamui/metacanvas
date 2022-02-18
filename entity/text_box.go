@@ -26,6 +26,13 @@ func (t *TextBox) Update(ctx *context.Context, eq event.Queue) {
 	t.updateInput(ctx, eq)
 }
 
+func swapShade(t bool) color.NRGBA {
+	if t {
+		return color.NRGBA{R: 0xff, A: 0xff}
+	}
+	return color.NRGBA{R: 0x80, B: 0x80, A: 0xFF}
+}
+
 func (t *TextBox) Render(ctx *context.Context) {
 	bounds := clip.RRect{
 		Rect: f32.Rectangle{
@@ -36,7 +43,7 @@ func (t *TextBox) Render(ctx *context.Context) {
 
 	// outline
 	cs := clip.Outline{Path: bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
-	paint.ColorOp{Color: color.NRGBA{R: 0x80, B: 0x80, A: 0xFF}}.Add(ctx.Ops)
+	paint.ColorOp{Color: swapShade(t.input.Pressed)}.Add(ctx.Ops)
 	paint.PaintOp{}.Add(ctx.Ops)
 	cs.Pop()
 }

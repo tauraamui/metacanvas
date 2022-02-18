@@ -63,6 +63,7 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 		case pointer.Release:
 			fallthrough
 		case pointer.Cancel:
+			i.Pressed = false
 			i.Dragging = false
 			i.Scroll = false
 		}
