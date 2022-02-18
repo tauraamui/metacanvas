@@ -2,20 +2,18 @@ package ctx
 
 import (
 	"gioui.org/f32"
+	"gioui.org/io/event"
 	"gioui.org/op"
 )
 
 type Context struct {
 	dirty    bool
 	Ops      *op.Ops
+	Events   event.Queue
 	MinScale float32
 	MaxScale float32
 	scale    float32
 	offset   f32.Point
-}
-
-func New(scale float32) *Context {
-	return &Context{scale: scale}
 }
 
 func (c *Context) IsDirty() bool {
@@ -82,9 +80,13 @@ func (c *Context) SubScale(s float32) {
 
 func (c *Context) ApplyTransformsToOps() {
 	op.Offset(c.offset).Add(c.Ops)
+	scale := c.scale
+	if scale == 0 {
+		scale = 1
+	}
 	aff := f32.Affine2D{}.Scale(
 		f32.Pt(0, 0),
-		f32.Pt(c.scale, c.scale),
+		f32.Pt(scale, scale),
 	)
 	op.Affine(aff).Add(c.Ops)
 }

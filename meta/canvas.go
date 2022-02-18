@@ -4,7 +4,7 @@ import (
 	"gioui.org/f32"
 	"gioui.org/io/event"
 	"gioui.org/io/pointer"
-	"gioui.org/layout"
+	"gioui.org/op"
 	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/input"
 )
@@ -17,7 +17,7 @@ type Canvas struct {
 
 func NewCanvas() *Canvas {
 	c := &Canvas{
-		ctx:  context.New(1),
+		ctx:  &context.Context{},
 		page: NewA4(),
 	}
 	c.input = &input.Pointer{}
@@ -25,15 +25,14 @@ func NewCanvas() *Canvas {
 	return c
 }
 
-func (c *Canvas) Update(gtx layout.Context) {
-	c.ctx.Ops = gtx.Ops
-	pointer.CursorNameOp{Name: c.updateInput(c.ctx, gtx.Queue)}.Add(gtx.Ops)
-	c.page.Update(c.ctx, gtx.Queue)
-}
+func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
+	c.ctx.Ops = ops
+	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(ops)
 
-func (c *Canvas) Render(gtx layout.Context) {
-	c.ctx.Ops = gtx.Ops
+	c.page.Update(c.ctx, eq)
+
 	c.ctx.ApplyTransformsToOps()
+
 	c.page.Render(c.ctx)
 }
 

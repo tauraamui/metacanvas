@@ -5,7 +5,6 @@ import (
 
 	"gioui.org/app"
 	"gioui.org/io/system"
-	"gioui.org/layout"
 	"gioui.org/op"
 	"github.com/tacusci/logging/v2"
 	"github.com/tauraamui/metacanvas/meta"
@@ -32,10 +31,9 @@ func run(w *app.Window) error {
 		case system.DestroyEvent:
 			return e.Err
 		case system.FrameEvent:
-			gtx := layout.NewContext(&ops, e)
-			canvas.Update(gtx)
-			canvas.Render(gtx)
-			e.Frame(gtx.Ops)
+			ops.Reset()
+			canvas.Render(&ops, e.Queue)
+			e.Frame(&ops)
 		}
 	}
 }
