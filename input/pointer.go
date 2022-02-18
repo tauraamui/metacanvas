@@ -16,7 +16,8 @@ type Pointer struct {
 	PointerID       pointer.ID
 	Scroll          bool
 	ScrollY         float32
-	Drag            bool
+	Pressed         bool
+	Dragging        bool
 	DragDeltaX      float32
 	DragDeltaY      float32
 	LastPosX        float32
@@ -41,9 +42,11 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 				i.ScrollY = x.Scroll.Y * .02
 			}
 		case pointer.Press:
-			if i.Drag {
+			if i.Dragging {
 				break
 			}
+			i.Pressed = true
+			i.Dragging = false
 			i.PointerID = x.PointerID
 			i.LastPosX = x.Position.X
 			i.LastPosY = x.Position.Y
@@ -51,7 +54,8 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 			if i.PointerID != x.PointerID {
 				break
 			}
-			i.Drag = true
+			i.Dragging = true
+			i.Pressed = false
 			i.DragDeltaX = i.LastPosX - x.Position.X
 			i.DragDeltaY = i.LastPosY - x.Position.Y
 			i.LastPosX = x.Position.X
@@ -59,7 +63,7 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 		case pointer.Release:
 			fallthrough
 		case pointer.Cancel:
-			i.Drag = false
+			i.Dragging = false
 			i.Scroll = false
 		}
 	}

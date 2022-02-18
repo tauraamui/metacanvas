@@ -39,7 +39,7 @@ func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
 func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
 	c.input.Update(ctx, eq)
 
-	if c.input.Drag {
+	if c.input.Dragging {
 		c.ctx.SubOffset(f32.Pt(c.input.DragDeltaX, c.input.DragDeltaY))
 		return pointer.CursorGrab
 	}
