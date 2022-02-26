@@ -17,7 +17,7 @@ type Canvas struct {
 
 func NewCanvas() *Canvas {
 	c := &Canvas{
-		ctx:  &context.Context{},
+		ctx:  context.DefaultCtx(),
 		page: NewA4(),
 	}
 	c.input = &input.Pointer{}

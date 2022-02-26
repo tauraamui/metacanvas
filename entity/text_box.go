@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"image/color"
 
 	"gioui.org/f32"
@@ -59,9 +58,6 @@ func (t *TextBox) updateInput(ctx *context.Context, eq event.Queue) pointer.Curs
 	}
 
 	t.input.Update(ctx, eq)
-	if t.input.Pressed {
-		fmt.Printf("PRESSED: %f, %f\n", t.input.LastPosX, t.input.LastPosY)
-	}
 
 	return pointer.CursorDefault
 }

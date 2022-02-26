@@ -16,6 +16,14 @@ type Context struct {
 	offset   f32.Point
 }
 
+func DefaultCtx() *Context {
+	return &Context{
+		scale:    1,
+		MinScale: 0.001,
+		MaxScale: 10,
+	}
+}
+
 func (c *Context) IsDirty() bool {
 	y := c.dirty
 	c.dirty = false
@@ -81,9 +89,6 @@ func (c *Context) SubScale(s float32) {
 func (c *Context) ApplyTransformsToOps() {
 	op.Offset(c.offset).Add(c.Ops)
 	scale := c.scale
-	if scale == 0 {
-		scale = 1
-	}
 	aff := f32.Affine2D{}.Scale(
 		f32.Pt(0, 0),
 		f32.Pt(scale, scale),
