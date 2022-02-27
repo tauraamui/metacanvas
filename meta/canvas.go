@@ -1,7 +1,6 @@
 package meta
 
 import (
-	"gioui.org/f32"
 	"gioui.org/io/event"
 	"gioui.org/io/pointer"
 	"gioui.org/op"
@@ -40,7 +39,7 @@ func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) pointer.Curso
 	c.input.Update(ctx, eq)
 
 	if c.input.Dragging {
-		c.ctx.SubOffset(f32.Pt(c.input.DragDeltaX, c.input.DragDeltaY))
+		c.ctx.SubOffset(c.input.DragDelta)
 		return pointer.CursorGrab
 	}
 
