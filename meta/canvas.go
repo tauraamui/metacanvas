@@ -27,16 +27,16 @@ func NewCanvas() *Canvas {
 func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
 	c.ctx.Ops = ops
 	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(ops)
-
-	c.page.Update(c.ctx, eq)
-
 	c.ctx.ApplyTransformsToOps()
-
 	c.page.Render(c.ctx)
 }
 
 func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
-	c.input.Update(ctx, eq)
+	c.input.Update(c.ctx, eq)
+
+	if captured := c.page.Update(ctx, c.input); captured {
+		return pointer.CursorDefault
+	}
 
 	if c.input.Dragging {
 		c.ctx.SubOffset(c.input.DragDelta)

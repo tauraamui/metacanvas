@@ -1,10 +1,10 @@
 package entity
 
 import (
-	"gioui.org/io/event"
 	context "github.com/tauraamui/metacanvas/ctx"
+	"github.com/tauraamui/metacanvas/input"
 )
 
 type Updateable interface {
-	Update(*context.Context, event.Queue)
+	Update(*context.Context, *input.Pointer) bool
 }

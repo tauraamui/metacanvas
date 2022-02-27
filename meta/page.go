@@ -4,11 +4,11 @@ import (
 	"image/color"
 
 	"gioui.org/f32"
-	"gioui.org/io/event"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/entity"
+	"github.com/tauraamui/metacanvas/input"
 )
 
 type page struct {
@@ -26,8 +26,8 @@ func NewA4() *page {
 	}
 }
 
-func (p *page) Update(ctx *context.Context, eq event.Queue) {
-	p.ee.Update(ctx, eq)
+func (p *page) Update(ctx *context.Context, ip *input.Pointer) bool {
+	return p.ee.Update(ctx, ip)
 }
 
 func (p *page) Render(ctx *context.Context) {

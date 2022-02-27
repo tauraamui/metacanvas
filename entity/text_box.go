@@ -4,7 +4,6 @@ import (
 	"image/color"
 
 	"gioui.org/f32"
-	"gioui.org/io/event"
 	"gioui.org/io/pointer"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
@@ -14,15 +13,15 @@ import (
 
 type TextBox struct {
 	X, Y, W, H float32
-	input      *input.Pointer
+	pressed    bool
 }
 
 func (t *TextBox) id() uint {
 	return 0
 }
 
-func (t *TextBox) Update(ctx *context.Context, eq event.Queue) {
-	t.updateInput(ctx, eq)
+func (t *TextBox) Update(ctx *context.Context, ip *input.Pointer) bool {
+	return pointer.CursorDefault != t.updateInput(ctx, ip)
 }
 
 func swapShade(t bool) color.NRGBA {
@@ -42,20 +41,20 @@ func (t *TextBox) Render(ctx *context.Context) {
 
 	// outline
 	cs := clip.Outline{Path: bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
-	paint.ColorOp{Color: swapShade(t.input.Pressed)}.Add(ctx.Ops)
+	paint.ColorOp{Color: swapShade(t.pressed)}.Add(ctx.Ops)
 	paint.PaintOp{}.Add(ctx.Ops)
 	cs.Pop()
 }
 
-func (t *TextBox) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
-	if t.input == nil || ctx.IsDirty() {
-		t.input = &input.Pointer{
-			AOE: ctx.ScreenRect2PtRect(t.X, t.Y, t.W, t.H),
-		}
-		t.input.PointerEventTag = t.input
-	}
+func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.CursorName {
+	// if t.input == nil || ctx.IsDirty() {
+	// 	t.input = &input.Pointer{
+	// 		AOE: ctx.ScreenRect2PtRect(t.X, t.Y, t.W, t.H),
+	// 	}
+	// 	t.input.PointerEventTag = t.input
+	// }
 
-	t.input.Update(ctx, eq)
+	// t.input.Update(ctx, eq)
 
 	return pointer.CursorDefault
 }
