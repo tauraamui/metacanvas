@@ -38,6 +38,12 @@ func (c *Context) Screen2Pt(pt f32.Point) f32.Point {
 	return pt.Add(c.offset)
 }
 
+func (c *Context) ScreenRect2PtRect(x, y, w, h float32) f32.Rectangle {
+	x = x + c.scale
+	y = y + c.scale
+	return f32.Rect(x, y, x+(w*c.scale), y+(h*c.scale)).Add(c.offset)
+}
+
 func (c *Context) SetOffset(o f32.Point) {
 	c.offset = o
 	c.dirty = true

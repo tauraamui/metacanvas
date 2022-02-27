@@ -49,10 +49,8 @@ func (t *TextBox) Render(ctx *context.Context) {
 
 func (t *TextBox) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
 	if t.input == nil || ctx.IsDirty() {
-		screenXY := ctx.Screen2Pt(f32.Pt(t.X, t.Y))
-		screenWH := ctx.Screen2Pt(f32.Pt(t.X+t.W, t.Y+t.H))
 		t.input = &input.Pointer{
-			AOE: f32.Rect(screenXY.X, screenXY.Y, screenWH.X, screenWH.Y),
+			AOE: ctx.ScreenRect2PtRect(t.X, t.Y, t.W, t.H),
 		}
 		t.input.PointerEventTag = t.input
 	}
