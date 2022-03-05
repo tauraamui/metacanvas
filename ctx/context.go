@@ -12,12 +12,14 @@ type Context struct {
 	Events   event.Queue
 	MinScale float32
 	MaxScale float32
+	pos      f32.Point
 	scale    float32
 	offset   f32.Point
 }
 
 func DefaultCtx() *Context {
 	return &Context{
+		pos:      f32.Pt(0, 0),
 		scale:    1,
 		MinScale: 0.001,
 		MaxScale: 10,
@@ -96,7 +98,7 @@ func (c *Context) ApplyTransformsToOps() {
 	op.Offset(c.offset).Add(c.Ops)
 	scale := c.scale
 	aff := f32.Affine2D{}.Scale(
-		f32.Pt(0, 0),
+		c.pos,
 		f32.Pt(scale, scale),
 	)
 	op.Affine(aff).Add(c.Ops)
