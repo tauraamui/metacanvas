@@ -39,6 +39,11 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 				i.Scroll = true
 				i.ScrollY = x.Scroll.Y * .02
 			}
+		case pointer.Move:
+			if i.Dragging {
+				break
+			}
+			i.Position = x.Position
 		case pointer.Press:
 			if i.Dragging {
 				break
