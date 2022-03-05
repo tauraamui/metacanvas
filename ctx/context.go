@@ -33,11 +33,11 @@ func (c *Context) IsDirty() bool {
 }
 
 func (c *Context) Pt2Screen(pt f32.Point) f32.Point {
-	return pt.Sub(c.offset)
+	return pt.Add(c.offset)
 }
 
 func (c *Context) Screen2Pt(pt f32.Point) f32.Point {
-	return pt.Add(c.offset)
+	return pt.Sub(c.offset)
 }
 
 func (c *Context) ScreenRect2PtRect(x, y, w, h float32) f32.Rectangle {
@@ -94,12 +94,12 @@ func (c *Context) SubScale(s float32) {
 	c.dirty = true
 }
 
-func (c *Context) ApplyTransformsToOps() {
-	op.Offset(c.offset).Add(c.Ops)
+func (c *Context) ApplyTransformsToOps() op.TransformStack {
+	op.Offset(c.offset).Push(c.Ops)
 	scale := c.scale
 	aff := f32.Affine2D{}.Scale(
 		c.pos,
 		f32.Pt(scale, scale),
 	)
-	op.Affine(aff).Add(c.Ops)
+	return op.Affine(aff).Push(c.Ops)
 }

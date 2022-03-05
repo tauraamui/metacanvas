@@ -27,7 +27,8 @@ func NewCanvas() *Canvas {
 func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
 	c.ctx.Ops = ops
 	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(ops)
-	c.ctx.ApplyTransformsToOps()
+	st := c.ctx.ApplyTransformsToOps()
+	defer st.Pop()
 	c.page.Render(c.ctx)
 }
 
