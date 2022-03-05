@@ -3,15 +3,18 @@ package meta
 import (
 	"gioui.org/io/event"
 	"gioui.org/io/pointer"
+	"gioui.org/io/system"
 	"gioui.org/op"
 	context "github.com/tauraamui/metacanvas/ctx"
 	"github.com/tauraamui/metacanvas/input"
 )
 
 type Canvas struct {
-	ctx   *context.Context
-	page  *page
-	input *input.Pointer
+	yOffset      int
+	ctx          *context.Context
+	page         *page
+	input        *input.Pointer
+	WindowInsets system.Insets
 }
 
 func NewCanvas() *Canvas {
@@ -22,6 +25,11 @@ func NewCanvas() *Canvas {
 	c.input = &input.Pointer{}
 	c.input.PointerEventTag = c.input
 	return c
+}
+
+func (c *Canvas) SetYOffset(o int) {
+	c.yOffset = o
+	c.input.YOffset = float32(o)
 }
 
 func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {

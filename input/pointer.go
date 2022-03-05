@@ -11,6 +11,7 @@ import (
 )
 
 type Pointer struct {
+	YOffset         float32
 	AOE             f32.Rectangle
 	PointerEventTag interface{}
 	PointerID       pointer.ID
@@ -29,6 +30,8 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 		if !ok {
 			continue
 		}
+
+		x.Position.Y -= i.YOffset
 
 		switch x.Type {
 		case pointer.Scroll:

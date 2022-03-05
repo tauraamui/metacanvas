@@ -3,15 +3,17 @@ package ctx
 import (
 	"gioui.org/f32"
 	"gioui.org/io/event"
+	"gioui.org/layout"
 	"gioui.org/op"
 )
 
 type Context struct {
-	dirty    bool
+	Ctx      layout.Context
 	Ops      *op.Ops
 	Events   event.Queue
 	MinScale float32
 	MaxScale float32
+	dirty    bool
 	pos      f32.Point
 	scale    float32
 	offset   f32.Point
@@ -33,11 +35,11 @@ func (c *Context) IsDirty() bool {
 }
 
 func (c *Context) Pt2Screen(pt f32.Point) f32.Point {
-	return pt.Add(c.offset)
+	return pt.Add(c.pos).Add(c.offset)
 }
 
 func (c *Context) Screen2Pt(pt f32.Point) f32.Point {
-	return pt.Sub(c.offset)
+	return pt.Add(c.pos).Sub(c.offset)
 }
 
 func (c *Context) ScreenRect2PtRect(x, y, w, h float32) f32.Rectangle {
