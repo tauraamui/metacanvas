@@ -14,6 +14,7 @@ import (
 
 type TextBox struct {
 	X, Y, W, H float32
+	bounds     clip.RRect
 	pressed    bool
 }
 
@@ -33,7 +34,7 @@ func swapShade(t bool) color.NRGBA {
 }
 
 func (t *TextBox) Render(ctx *context.Context) {
-	bounds := clip.RRect{
+	t.bounds = clip.RRect{
 		Rect: f32.Rectangle{
 			Min: f32.Pt(t.X, t.Y),
 			Max: f32.Pt(t.X+t.W, t.Y+t.H),
@@ -41,16 +42,16 @@ func (t *TextBox) Render(ctx *context.Context) {
 	}
 
 	// outline
-	cs := clip.Outline{Path: bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
+	cs := clip.Outline{Path: t.bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
 	paint.ColorOp{Color: swapShade(t.pressed)}.Add(ctx.Ops)
 	paint.PaintOp{}.Add(ctx.Ops)
 	cs.Pop()
 }
 
 func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.CursorName {
-	fmt.Printf("IP: %s\n", ctx.Screen2Pt(ip.Position).String())
+	fmt.Printf("IP: %s\n", ctx.ScreenToPt(ip.Position).String())
 	fmt.Printf("TBX POS+SIZE: X/Y: %s, XW/YH: %s\n", f32.Pt(t.X, t.Y).String(), f32.Pt(t.X+t.W, t.Y+t.H))
-	if ip.Pressed && t.withinBounds(ctx.Screen2Pt(ip.Position)) {
+	if ip.Pressed && t.withinBounds(ctx.ScreenToPt(ip.Position)) {
 		t.pressed = true
 		return pointer.CursorGrab
 	}
@@ -59,8 +60,5 @@ func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.C
 }
 
 func (t *TextBox) withinBounds(p f32.Point) bool {
-	if t.X < p.X && p.X < t.X+t.W {
-		return t.Y < p.Y && p.Y < t.Y+t.H
-	}
-	return false
+	return p.In(t.bounds.Rect)
 }
