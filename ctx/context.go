@@ -34,18 +34,16 @@ func (c *Context) IsDirty() bool {
 	return y
 }
 
-func (c *Context) Pt2Screen(pt f32.Point) f32.Point {
+func (c *Context) PtToScreen(pt f32.Point) f32.Point {
 	return pt.Add(c.pos).Add(c.offset)
 }
 
-func (c *Context) Screen2Pt(pt f32.Point) f32.Point {
+func (c *Context) ScreenToPt(pt f32.Point) f32.Point {
 	return pt.Add(c.pos).Sub(c.offset)
 }
 
-func (c *Context) ScreenRect2PtRect(x, y, w, h float32) f32.Rectangle {
-	x = x + c.scale
-	y = y + c.scale
-	return f32.Rect(x, y, x+(w*c.scale), y+(h*c.scale)).Add(c.offset)
+func (c *Context) PtRectToScreen() f32.Rectangle {
+	return f32.Rectangle{}
 }
 
 func (c *Context) SetOffset(o f32.Point) {
