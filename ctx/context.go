@@ -10,6 +10,7 @@ import (
 type Context struct {
 	Ctx      layout.Context
 	Ops      *op.Ops
+	Aff      f32.Affine2D
 	Events   event.Queue
 	MinScale float32
 	MaxScale float32
@@ -94,12 +95,17 @@ func (c *Context) SubScale(s float32) {
 	c.dirty = true
 }
 
+func (c *Context) Scale() float32 {
+	return c.scale
+}
+
 func (c *Context) ApplyTransformsToOps() op.TransformStack {
 	op.Offset(c.offset).Push(c.Ops)
 	scale := c.scale
-	aff := f32.Affine2D{}.Scale(
+	c.Aff = f32.Affine2D{}.Scale(
 		c.pos,
 		f32.Pt(scale, scale),
 	)
-	return op.Affine(aff).Push(c.Ops)
+
+	return op.Affine(c.Aff).Push(c.Ops)
 }

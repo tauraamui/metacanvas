@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"image/color"
 
 	"gioui.org/f32"
@@ -49,9 +48,7 @@ func (t *TextBox) Render(ctx *context.Context) {
 }
 
 func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.CursorName {
-	fmt.Printf("IP: %s\n", ctx.ScreenToPt(ip.Position).String())
-	fmt.Printf("TBX POS+SIZE: X/Y: %s, XW/YH: %s\n", f32.Pt(t.X, t.Y).String(), f32.Pt(t.X+t.W, t.Y+t.H))
-	if ip.Pressed && t.withinBounds(ctx.ScreenToPt(ip.Position)) {
+	if ip.Pressed && t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position)) {
 		t.pressed = true
 		return pointer.CursorGrab
 	}
@@ -59,6 +56,10 @@ func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.C
 	return pointer.CursorDefault
 }
 
-func (t *TextBox) withinBounds(p f32.Point) bool {
-	return p.In(t.bounds.Rect)
+func (t *TextBox) withinBounds(aff f32.Affine2D, p f32.Point) bool {
+	return p.In(transformRect(t.bounds.Rect, aff))
+}
+
+func transformRect(r f32.Rectangle, aff f32.Affine2D) f32.Rectangle {
+	return f32.Rectangle{Min: aff.Transform(r.Min), Max: aff.Transform(r.Max)}
 }
