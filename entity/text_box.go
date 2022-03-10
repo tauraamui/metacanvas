@@ -12,9 +12,9 @@ import (
 )
 
 type TextBox struct {
-	X, Y, W, H float32
-	bounds     clip.RRect
-	pressed    bool
+	Min, Max f32.Point
+	bounds   clip.RRect
+	pressed  bool
 }
 
 func (t *TextBox) id() uint {
@@ -35,8 +35,8 @@ func swapShade(t bool) color.NRGBA {
 func (t *TextBox) Render(ctx *context.Context) {
 	t.bounds = clip.RRect{
 		Rect: f32.Rectangle{
-			Min: f32.Pt(t.X, t.Y),
-			Max: f32.Pt(t.X+t.W, t.Y+t.H),
+			Min: t.Min,
+			Max: t.Max,
 		},
 	}
 
