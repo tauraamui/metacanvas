@@ -48,7 +48,7 @@ func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) {
 	}
 
 	if c.input.Dragging {
-		c.ctx.SubOffset(c.input.DragDelta.Mul(2.002))
+		c.ctx.AddOffset(c.input.DragDelta.Mul(2.002))
 		pointer.CursorNameOp{Name: pointer.CursorGrab}.Add(ctx.Ops)
 		return
 	}
