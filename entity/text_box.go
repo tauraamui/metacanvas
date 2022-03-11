@@ -59,8 +59,9 @@ func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) (pointer.
 
 		if ip.Dragging {
 			t.active = true
-			t.Min = t.Min.Sub(ip.DragDelta)
-			t.Max = t.Max.Sub(ip.DragDelta)
+			dd := ip.DragDelta.Mul(2)
+			t.Min = t.Min.Add(dd)
+			t.Max = t.Max.Add(dd)
 			return pointer.CursorGrab, captured
 		}
 		return pointer.CursorText, captured
