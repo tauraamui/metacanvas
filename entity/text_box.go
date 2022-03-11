@@ -14,7 +14,7 @@ import (
 type TextBox struct {
 	Min, Max f32.Point
 	bounds   clip.RRect
-	pressed  bool
+	active   bool
 }
 
 func (t *TextBox) id() uint {
@@ -25,13 +25,6 @@ func (t *TextBox) Update(ctx *context.Context, ip *input.Pointer) bool {
 	return pointer.CursorDefault != t.updateInput(ctx, ip)
 }
 
-func swapShade(t bool) color.NRGBA {
-	if t {
-		return color.NRGBA{R: 0xff, A: 0xff}
-	}
-	return color.NRGBA{R: 0x80, B: 0x80, A: 0xFF}
-}
-
 func (t *TextBox) Render(ctx *context.Context) {
 	t.bounds = clip.RRect{
 		Rect: f32.Rectangle{
@@ -40,19 +33,33 @@ func (t *TextBox) Render(ctx *context.Context) {
 		},
 	}
 
-	// outline
-	cs := clip.Outline{Path: t.bounds.Path(ctx.Ops)}.Op().Push(ctx.Ops)
-	paint.ColorOp{Color: swapShade(t.pressed)}.Add(ctx.Ops)
+	if t.active {
+		t.renderOutline(ctx)
+	}
+}
+
+func (t *TextBox) renderOutline(ctx *context.Context) {
+	cl := clip.Stroke{Path: t.bounds.Path(ctx.Ops), Width: 1.3}.Op().Push(ctx.Ops)
+	paint.ColorOp{Color: color.NRGBA{A: 0xFF}}.Add(ctx.Ops)
 	paint.PaintOp{}.Add(ctx.Ops)
-	cs.Pop()
+	cl.Pop()
 }
 
 func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.CursorName {
-	if ip.Pressed && t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position)) {
-		t.pressed = true
-		return pointer.CursorGrab
+	inBounds := t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position))
+	if inBounds {
+		if ip.Pressed {
+			t.active = true
+			return pointer.CursorDefault
+		}
+		return pointer.CursorText
 	}
-	t.pressed = false
+
+	if ip.Pressed {
+		t.active = false
+		return pointer.CursorDefault
+	}
+
 	return pointer.CursorDefault
 }
 
