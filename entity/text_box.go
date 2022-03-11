@@ -22,7 +22,9 @@ func (t *TextBox) id() uint {
 }
 
 func (t *TextBox) Update(ctx *context.Context, ip *input.Pointer) bool {
-	return pointer.CursorDefault != t.updateInput(ctx, ip)
+	cursor, captured := t.updateInput(ctx, ip)
+	pointer.CursorNameOp{Name: cursor}.Add(ctx.Ops)
+	return captured
 }
 
 func (t *TextBox) Render(ctx *context.Context) {
@@ -45,22 +47,24 @@ func (t *TextBox) renderOutline(ctx *context.Context) {
 	cl.Pop()
 }
 
-func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) pointer.CursorName {
+func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) (pointer.CursorName, bool) {
 	inBounds := t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position))
+	captured := false
 	if inBounds {
+		captured = true
 		if ip.Pressed {
 			t.active = true
-			return pointer.CursorDefault
+			return pointer.CursorDefault, captured
 		}
-		return pointer.CursorText
+		return pointer.CursorText, captured
 	}
 
 	if ip.Pressed {
 		t.active = false
-		return pointer.CursorDefault
+		return pointer.CursorDefault, captured
 	}
 
-	return pointer.CursorDefault
+	return pointer.CursorDefault, captured
 }
 
 func (t *TextBox) withinBounds(aff f32.Affine2D, p f32.Point) bool {

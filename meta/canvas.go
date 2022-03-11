@@ -34,27 +34,26 @@ func (c *Canvas) SetYOffset(o int) {
 
 func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
 	c.ctx.Ops = ops
-	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(c.ctx.Ops)
+	c.updateInput(c.ctx, eq)
 	st := c.ctx.ApplyTransformsToOps()
 	defer st.Pop()
 	c.page.Render(c.ctx)
 }
 
-func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) pointer.CursorName {
+func (c *Canvas) updateInput(ctx *context.Context, eq event.Queue) {
 	c.input.Update(c.ctx, eq)
 
 	if captured := c.page.Update(ctx, c.input); captured {
-		return pointer.CursorDefault
+		return
 	}
 
 	if c.input.Dragging {
 		c.ctx.SubOffset(c.input.DragDelta)
-		return pointer.CursorGrab
+		pointer.CursorNameOp{Name: pointer.CursorGrab}.Add(ctx.Ops)
+		return
 	}
 
 	if c.input.Scroll {
 		c.ctx.SubScale(c.input.ScrollY)
 	}
-
-	return pointer.CursorDefault
 }
