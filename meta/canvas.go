@@ -34,7 +34,7 @@ func (c *Canvas) SetYOffset(o int) {
 
 func (c *Canvas) Render(ops *op.Ops, eq event.Queue) {
 	c.ctx.Ops = ops
-	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(ops)
+	pointer.CursorNameOp{Name: c.updateInput(c.ctx, eq)}.Add(c.ctx.Ops)
 	st := c.ctx.ApplyTransformsToOps()
 	defer st.Pop()
 	c.page.Render(c.ctx)

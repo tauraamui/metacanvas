@@ -80,6 +80,6 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 	pointer.InputOp{
 		Tag:          &i.PointerEventTag,
 		ScrollBounds: image.Rect(-1, -1, 1, 1),
-		Types:        pointer.Press | pointer.Drag | pointer.Release | pointer.Scroll,
+		Types:        pointer.Move | pointer.Press | pointer.Drag | pointer.Release | pointer.Scroll,
 	}.Add(ctx.Ops)
 }
