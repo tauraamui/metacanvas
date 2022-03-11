@@ -2,6 +2,7 @@ package input
 
 import (
 	"image"
+	"math"
 
 	"gioui.org/f32"
 	"gioui.org/io/event"
@@ -23,6 +24,10 @@ type Pointer struct {
 	Position        f32.Point
 }
 
+func (i *Pointer) NormaliseDeltaWithin(min, max float32) f32.Point {
+	return i.DragDelta
+}
+
 func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 	i.Scroll = false
 	for _, evt := range eq.Events(&i.PointerEventTag) {
@@ -32,6 +37,8 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 		}
 
 		x.Position.Y -= i.YOffset
+		x.Position.X = float32(math.Round(float64(x.Position.X)))
+		x.Position.Y = float32(math.Round(float64(x.Position.Y)))
 
 		switch x.Type {
 		case pointer.Scroll:
