@@ -12,9 +12,61 @@ import (
 )
 
 type TextBox struct {
-	Min, Max f32.Point
-	bounds   clip.RRect
-	active   bool
+	bounds clip.RRect
+	anchor anchor
+	active bool
+}
+
+func NewTextBox(min, max f32.Point) *TextBox {
+	return &TextBox{
+		bounds: clip.RRect{
+			Rect: f32.Rectangle{Min: min, Max: max},
+		},
+	}
+}
+
+// structure to contain functionality related to tracking the cursor's movement
+// relative to the bounds and position of the textbox area
+type anchor struct {
+	point           f32.Point
+	recentlyPressed bool
+}
+
+func (a *anchor) update(bounds clip.RRect, ip *input.Pointer, inBounds bool) (f32.Point, bool) {
+	if ip.Pressed {
+		a.updatePressed(bounds, ip, inBounds)
+		return f32.Point{}, false
+	}
+
+	if ip.Dragging {
+		return a.updateDragged(bounds, ip), true
+	}
+
+	return f32.Point{}, false
+}
+
+func (a *anchor) updateDragged(bounds clip.RRect, ip *input.Pointer) f32.Point {
+	delta := ip.Position.Sub(bounds.Rect.Min).Sub(a.point)
+	return delta
+}
+
+func (a *anchor) updatePressed(bounds clip.RRect, ip *input.Pointer, inBounds bool) {
+	if !inBounds {
+		a.point = f32.Point{}
+		return
+	}
+
+	if !a.recentlyPressed {
+		a.recentlyPressed = true
+	}
+
+	if a.recentlyPressed {
+		a.recentlyPressed = false
+		a.point = ip.Position.Sub(bounds.Rect.Min)
+		return
+	}
+
+	a.point = f32.Point{}
 }
 
 func (t *TextBox) id() uint {
@@ -28,13 +80,6 @@ func (t *TextBox) Update(ctx *context.Context, ip *input.Pointer) bool {
 }
 
 func (t *TextBox) Render(ctx *context.Context) {
-	t.bounds = clip.RRect{
-		Rect: f32.Rectangle{
-			Min: t.Min,
-			Max: t.Max,
-		},
-	}
-
 	if t.active {
 		t.renderOutline(ctx)
 	}
@@ -49,30 +94,29 @@ func (t *TextBox) renderOutline(ctx *context.Context) {
 
 func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) (pointer.CursorName, bool) {
 	inBounds := t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position))
-	captured := false
+	return t.anchorUpdate(ip, inBounds), t.active
+}
+
+func (t *TextBox) anchorUpdate(ip *input.Pointer, inBounds bool) pointer.CursorName {
+	delta, moving := t.anchor.update(t.bounds, ip, inBounds)
+	if moving {
+		t.bounds.Rect.Min = t.bounds.Rect.Min.Add(delta)
+		t.bounds.Rect.Max = t.bounds.Rect.Max.Add(delta)
+		return pointer.CursorGrab
+	}
+
 	if inBounds {
-		captured = true
 		if ip.Pressed {
 			t.active = true
-			return pointer.CursorDefault, captured
 		}
-
-		if ip.Dragging {
-			t.active = true
-			dd := ip.DragDelta.Mul(2)
-			t.Min = t.Min.Add(dd)
-			t.Max = t.Max.Add(dd)
-			return pointer.CursorGrab, captured
+		return pointer.CursorText
+	} else {
+		if ip.Pressed {
+			t.active = false
 		}
-		return pointer.CursorText, captured
 	}
 
-	if ip.Pressed {
-		t.active = false
-		return pointer.CursorDefault, captured
-	}
-
-	return pointer.CursorDefault, captured
+	return pointer.CursorDefault
 }
 
 func (t *TextBox) withinBounds(aff f32.Affine2D, p f32.Point) bool {

@@ -2,6 +2,7 @@ package input
 
 import (
 	"image"
+	"math"
 
 	"gioui.org/f32"
 	"gioui.org/io/event"
@@ -31,6 +32,8 @@ func (i *Pointer) Update(ctx *context.Context, eq event.Queue) {
 			continue
 		}
 
+		x.Position.X = float32(math.Round(float64(x.Position.X)))
+		x.Position.Y = float32(math.Round(float64(x.Position.Y)))
 		x.Position.Y -= i.YOffset
 
 		switch x.Type {

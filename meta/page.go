@@ -21,7 +21,7 @@ func NewA4() *page {
 	return &page{
 		W: 800, H: 1000,
 		ee: entity.Stack{
-			&entity.TextBox{Min: f32.Pt(10, 10), Max: f32.Pt(400, 40)},
+			entity.NewTextBox(f32.Pt(10, 10), f32.Pt(400, 40)),
 		},
 	}
 }
