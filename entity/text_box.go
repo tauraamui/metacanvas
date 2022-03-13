@@ -19,6 +19,7 @@ type TextBox struct {
 
 func NewTextBox(min, max f32.Point) *TextBox {
 	return &TextBox{
+		anchor: anchor{position: min},
 		bounds: clip.RRect{
 			Rect: f32.Rectangle{Min: min, Max: max},
 		},
@@ -28,29 +29,30 @@ func NewTextBox(min, max f32.Point) *TextBox {
 // structure to contain functionality related to tracking the cursor's movement
 // relative to the bounds and position of the textbox area
 type anchor struct {
+	position        f32.Point
 	point           f32.Point
 	recentlyPressed bool
 }
 
-func (a *anchor) update(bounds clip.RRect, ip *input.Pointer, inBounds bool) (f32.Point, bool) {
+func (a *anchor) update(ip *input.Pointer, inBounds bool) (f32.Point, bool) {
 	if ip.Pressed {
-		a.updatePressed(bounds, ip, inBounds)
+		a.updatePressed(ip, inBounds)
 		return f32.Point{}, false
 	}
 
 	if ip.Dragging {
-		return a.updateDragged(bounds, ip), true
+		return a.updateDragged(ip), true
 	}
 
 	return f32.Point{}, false
 }
 
-func (a *anchor) updateDragged(bounds clip.RRect, ip *input.Pointer) f32.Point {
-	delta := ip.Position.Sub(bounds.Rect.Min).Sub(a.point)
+func (a *anchor) updateDragged(ip *input.Pointer) f32.Point {
+	delta := ip.Position.Sub(a.position).Sub(a.point)
 	return delta
 }
 
-func (a *anchor) updatePressed(bounds clip.RRect, ip *input.Pointer, inBounds bool) {
+func (a *anchor) updatePressed(ip *input.Pointer, inBounds bool) {
 	if !inBounds {
 		a.point = f32.Point{}
 		return
@@ -62,7 +64,7 @@ func (a *anchor) updatePressed(bounds clip.RRect, ip *input.Pointer, inBounds bo
 
 	if a.recentlyPressed {
 		a.recentlyPressed = false
-		a.point = ip.Position.Sub(bounds.Rect.Min)
+		a.point = ip.Position.Sub(a.position)
 		return
 	}
 
@@ -98,9 +100,10 @@ func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) (pointer.
 }
 
 func (t *TextBox) anchorUpdate(ip *input.Pointer, inBounds bool) pointer.CursorName {
-	delta, moving := t.anchor.update(t.bounds, ip, inBounds)
+	delta, moving := t.anchor.update(ip, inBounds)
 	if moving {
 		t.bounds.Rect.Min = t.bounds.Rect.Min.Add(delta)
+		t.anchor.position = t.bounds.Rect.Min
 		t.bounds.Rect.Max = t.bounds.Rect.Max.Add(delta)
 		return pointer.CursorGrab
 	}
