@@ -76,7 +76,8 @@ func (t *TextBox) id() uint {
 }
 
 func (t *TextBox) Update(ctx *context.Context, ip *input.Pointer) bool {
-	cursor, captured := t.updateInput(ctx, ip)
+	inBounds := t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position))
+	cursor, captured := t.anchorUpdate(ip, inBounds), t.active
 	pointer.CursorNameOp{Name: cursor}.Add(ctx.Ops)
 	return captured
 }
@@ -92,11 +93,6 @@ func (t *TextBox) renderOutline(ctx *context.Context) {
 	paint.ColorOp{Color: color.NRGBA{A: 0xFF}}.Add(ctx.Ops)
 	paint.PaintOp{}.Add(ctx.Ops)
 	cl.Pop()
-}
-
-func (t *TextBox) updateInput(ctx *context.Context, ip *input.Pointer) (pointer.CursorName, bool) {
-	inBounds := t.withinBounds(ctx.Aff, ctx.ScreenToPt(ip.Position))
-	return t.anchorUpdate(ip, inBounds), t.active
 }
 
 func (t *TextBox) anchorUpdate(ip *input.Pointer, inBounds bool) pointer.CursorName {
